@@ -1,0 +1,8 @@
+
+
+class GlobalProvider{
+
+  String usuarioIDV;
+
+
+}
