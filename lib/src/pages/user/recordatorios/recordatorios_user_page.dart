@@ -1,5 +1,6 @@
 import 'package:cherche_ultimo/src/const_global/const_global.dart';
 import 'package:cherche_ultimo/src/local_notifications_core/permitions_and_settings.dart';
+import 'package:cherche_ultimo/src/utils/snackbar.dart';
 import 'package:cherche_ultimo/src/widget/button_app.dart';
 import 'package:cherche_ultimo/src/widget/clock_widget.dart';
 import 'package:cherche_ultimo/src/widget/date_widget.dart';
@@ -18,6 +19,8 @@ class RecordatoriosUserPage extends StatefulWidget {
 }
 
 class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
+  GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
+
   TimeOfDay hora;
   DateTime fecha;
   String descripcion = "";
@@ -26,7 +29,7 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
   @override
   void initState() {
     super.initState();
-    requestPermissions();
+    //requestPermissions();
     configureDidReceiveLocalNotificationSubject(context);
     configureSelectNotificationSubject(context);
   }
@@ -34,6 +37,7 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: key,
       appBar: AppBar(),
       // permite hacer scrol SingleChildScrollView
       body: SingleChildScrollView(
@@ -159,7 +163,6 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
         onPressedP: () {
           if (hora != null && fecha != null && descripcion != "") {
             addNotification();
-
           }
         },
         text: 'Guuardar',
@@ -193,6 +196,7 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time);
+    Snackbar.showSnackbar(context, key, 'El recordatorio fue agregado');
     print('notificacion agregada');
   }
 
