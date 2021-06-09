@@ -33,9 +33,11 @@ dependencies:
   provider: ^5.0.0
   shared_preferences: ^2.0.5
   curved_navigation_bar: ^0.3.7
-  firebase_messaging: ^7.0.3
+  firebase_messaging:
   progress_dialog: ^1.2.0
-  flutter_local_notifications:
+  flutter_native_timezone: ^1.0.10
+  rxdart:
+  flutter_local_notifications: ^6.0.0
   flutter_localizations:
     sdk: flutter
 
