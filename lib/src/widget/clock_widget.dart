@@ -80,8 +80,7 @@ class _ClockInputState extends State<ClockInput> {
           focusNode: FocusNode(),
           enableInteractiveSelection: false,
           enabled: false,
-          controller: _textEditingController
-            ,
+          controller: _textEditingController,
           decoration: InputDecoration(
               fillColor: Theme.of(context).dividerColor,
               border: OutlineInputBorder(

@@ -1,5 +1,7 @@
+import 'package:cherche_ultimo/main.dart';
 import 'package:cherche_ultimo/src/const_global/const_global.dart';
 import 'package:cherche_ultimo/src/local_notifications_core/permitions_and_settings.dart';
+import 'package:cherche_ultimo/src/pages/user/recordatorios/models/Remind.dart';
 import 'package:cherche_ultimo/src/utils/snackbar.dart';
 import 'package:cherche_ultimo/src/widget/button_app.dart';
 import 'package:cherche_ultimo/src/widget/clock_widget.dart';
@@ -10,8 +12,7 @@ import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
-
-import '../../../../main.dart';
+import 'package:intl/intl.dart';
 
 class RecordatoriosUserPage extends StatefulWidget {
   @override
@@ -20,11 +21,13 @@ class RecordatoriosUserPage extends StatefulWidget {
 
 class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
   GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
-
+  bool init = true;
+  bool fromEdit = false;
   TimeOfDay hora;
   DateTime fecha;
   String descripcion = "";
   bool cargando = true;
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -36,52 +39,79 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: key,
-      appBar: AppBar(),
-      // permite hacer scrol SingleChildScrollView
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _bannerApp(context),
-            _textLogin(),
-            Container(
-              child: DateInput(
-                dataString: "",
-                hintText: 'Fecha de recordatorio',
-                labelText: "Fecha de recordatorio",
-                helperText: "Fecha de recordatorio",
-                onChange: (String value) {},
-                helpText: "Selecciona la caducidad del producto",
-                errorText: "",
-                thenDateFunction: (DateTime date) {
-                  print('======== Aqui DATA=========');
-                  print(date);
-                  fecha = date;
-                },
-                lastDate: DateTime.now().add(Duration(days: 360 * 100)),
+    final Remind remind = ModalRoute.of(context).settings.arguments as Remind;
+    if (remind != null && init) {
+      fromEdit = true;
+      setState(() {
+        descripcion = remind.description;
+        textEditingController.text = remind.description;
+        hora = TimeOfDay(hour: remind.hour, minute: remind.minute);
+        fecha = remind.date;
+      });
+      init = false;
+    }
+    String formatDate(DateTime date) {
+      if (date != null) {
+        final DateFormat formatter = DateFormat('yyyy-MM-dd');
+        return formatter.format(date);
+      }
+      return null;
+    }
+
+    return WillPopScope(
+      onWillPop: () async {
+        // You can do some work here.
+        // Returning true allows the pop to happen, returning false prevents it.
+        Navigator.of(context).pushReplacementNamed("recordatoriosUserListPage");
+        return false;
+      },
+      child: Scaffold(
+        key: key,
+        appBar: AppBar(),
+        // permite hacer scrol SingleChildScrollView
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              _bannerApp(context),
+              _textLogin(),
+              Container(
+                child: DateInput(
+                  dataString: formatDate(remind?.date) ?? "",
+                  hintText: 'Fecha de recordatorio',
+                  labelText: "Fecha de recordatorio",
+                  helperText: "Fecha de recordatorio",
+                  onChange: (String value) {},
+                  helpText: "Selecciona la fecha",
+                  errorText: "",
+                  thenDateFunction: (DateTime date) {
+                    print('======== Aqui DATA=========');
+                    print(date);
+                    fecha = date;
+                  },
+                  lastDate: DateTime.now().add(Duration(days: 360 * 100)),
+                ),
               ),
-            ),
-            Container(
-              child: ClockInput(
-                dataString: "",
-                hintText: 'Fecha de recordatorio',
-                labelText: "Fecha de recordatorio",
-                helperText: "Fecha de recordatorio",
-                onChange: (String value) {},
-                helpText: "Selecciona la caducidad del producto",
-                errorText: "",
-                thenDateFunction: (TimeOfDay date) {
-                  print('======== Aqui clock=========');
-                  print(date);
-                  hora = date;
-                },
-                lastDate: DateTime.now().add(Duration(days: 360 * 100)),
+              Container(
+                child: ClockInput(
+                  dataString: hora?.format(context) ?? "",
+                  hintText: 'Fecha de recordatorio',
+                  labelText: "Fecha de recordatorio",
+                  helperText: "Fecha de recordatorio",
+                  onChange: (String value) {},
+                  helpText: "Fecha de recordatorio",
+                  errorText: "",
+                  thenDateFunction: (TimeOfDay date) {
+                    print('======== Aqui clock=========');
+                    print(date);
+                    hora = date;
+                  },
+                  lastDate: DateTime.now().add(Duration(days: 360 * 100)),
+                ),
               ),
-            ),
-            _textFielDescripcion(),
-            _buttonLogin(),
-          ],
+              _textFielDescripcion(),
+              _buttonLogin(remind),
+            ],
+          ),
         ),
       ),
     );
@@ -91,6 +121,7 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 30),
       child: TextField(
+        controller: textEditingController,
         decoration: InputDecoration(
             labelText: 'Descripción',
             helperText: 'Detalles del recordatorio',
@@ -140,29 +171,13 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
     );
   }
 
-  Widget _textFielEmail() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30),
-      child: TextField(
-        //controller: _con.emailController,
-        decoration: InputDecoration(
-            labelText: 'Descripcion',
-            //helperText: 'correo@ejemplo.com',
-            suffixIcon: Icon(
-              Icons.email_outlined,
-              color: Colors.blue,
-            )),
-      ),
-    );
-  }
-
-  Widget _buttonLogin() {
+  Widget _buttonLogin(Remind remind) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 30, vertical: 25),
       child: ButtonApp(
         onPressedP: () {
           if (hora != null && fecha != null && descripcion != "") {
-            addNotification();
+            addNotification(remind);
           }
         },
         text: 'Guuardar',
@@ -176,7 +191,14 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  Future<void> addNotification() async {
+  Future<void> addNotification(Remind remind) async {
+    if (remind != null && fromEdit) {
+      await flutterLocalNotificationsPlugin.cancel(remind.remindId);
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      sharedPreferences.remove("$REMIND${remind.remindId}");
+    }
+
     tz.TZDateTime scheduledDate = tz.TZDateTime(
         tz.local, fecha.year, fecha.month, fecha.day, hora.hour, hora.minute);
     int id = await guardarObtenerNuevoIdNotificacion();
@@ -196,18 +218,37 @@ class _RecordatoriosUserPageState extends State<RecordatoriosUserPage> {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time);
+    Navigator.of(context).pushReplacementNamed("recordatoriosUserListPage");
     Snackbar.showSnackbar(context, key, 'El recordatorio fue agregado');
-    print('notificacion agregada');
+
   }
 
   Future<int> guardarObtenerNuevoIdNotificacion() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
     if (sharedPreferences.containsKey(ALARM_ID)) {
       int currentId = sharedPreferences.getInt(ALARM_ID);
       int newId = currentId + 1;
       sharedPreferences.setInt(ALARM_ID, newId);
+      Remind remind = Remind(
+        remindId: newId,
+        date: fecha,
+        hour: hora.hour,
+        minute: hora.minute,
+        description: descripcion,
+      );
+      sharedPreferences.setString("$REMIND$newId", remindToJson(remind));
       return newId;
     }
+    Remind remind = Remind(
+      remindId: 0,
+      date: fecha,
+      hour: hora.hour,
+      minute: hora.minute,
+      description: descripcion,
+    );
+    sharedPreferences.setString("$REMIND" + "0", remindToJson(remind));
+
     sharedPreferences.setInt(ALARM_ID, 0);
     return 0;
   }

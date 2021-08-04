@@ -63,7 +63,7 @@ class MenuDialog extends StatelessWidget {
             ),
             ListTile(
               onTap: () {
-                Navigator.pushNamed(context, 'recordatoriosUserPage');
+                Navigator.pushNamed(context, 'recordatoriosUserListPage');
               },
               title: Text('Recodatorios'),
               leading: Icon(Icons.add_alert_outlined),

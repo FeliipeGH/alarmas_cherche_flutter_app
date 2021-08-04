@@ -4,10 +4,14 @@ import 'package:cherche_ultimo/src/pages/home/home_page.dart';
 import 'package:cherche_ultimo/src/pages/splash_screen/splash_screen.dart';
 import 'package:cherche_ultimo/src/pages/transport/login/login_transport_page.dart';
 import 'package:cherche_ultimo/src/pages/transport/main_transport_page/main_transport_page.dart';
+import 'package:cherche_ultimo/src/pages/user/info_bases/info_bases_page.dart';
+import 'package:cherche_ultimo/src/pages/user/info_bases_paradas/info_bases_paradas_page.dart';
+import 'package:cherche_ultimo/src/pages/user/info_bases_recorridos/info_bases_recorridos_page.dart';
 import 'package:cherche_ultimo/src/pages/user/login/login_user_page.dart';
 import 'package:cherche_ultimo/src/pages/user/main_page/main_user_page.dart';
 import 'package:cherche_ultimo/src/pages/user/profile/profile_user_page.dart';
 import 'package:cherche_ultimo/src/pages/user/rates/rates_list.dart';
+import 'package:cherche_ultimo/src/pages/user/recordatorios/recordatorios_user_list_page.dart';
 import 'package:cherche_ultimo/src/pages/user/recordatorios/recordatorios_user_page.dart';
 import 'package:cherche_ultimo/src/pages/user/register/client_register_page.dart';
 import 'package:cherche_ultimo/src/pages/user/schedule/schedule_list.dart';
@@ -73,7 +77,7 @@ class _MyAppState extends State<MyApp> {
           // remueve mensaje de debug
           debugShowCheckedModeBanner: false,
           title: 'Cherche Transport ',
-          initialRoute: 'recordatoriosUserPage',
+          initialRoute: 'mainUserPage',
           theme: ThemeData(
             fontFamily: 'NimbusSans',
             //para quitar la barra superior
@@ -83,7 +87,10 @@ class _MyAppState extends State<MyApp> {
           routes: {
             'splashScreen': (BuildContext context) => SplashScreen(),
             'home': (BuildContext context) => HomePage(),
-
+            'infoBasesPage': (BuildContext context) =>
+                InfoBasesPage.init(context),
+            'infoBasesRecorridosPage': (BuildContext context) =>
+                InfoBasesRecorridosPage.init(context),
             //all user
             'loginUser': (BuildContext context) => LoginUserPage(),
             'clientRegisterPage': (BuildContext context) =>
@@ -94,7 +101,8 @@ class _MyAppState extends State<MyApp> {
             'profileUserPage': (BuildContext context) => ProfileUserPage(),
             'recordatoriosUserPage': (BuildContext context) =>
                 RecordatoriosUserPage(),
-
+            'recordatoriosUserListPage': (BuildContext current) =>
+                RecordatoriosUserListPage.init(current),
             //all transport
             'loginTransportPage': (BuildContext context) =>
                 LoginTransportPage(),
